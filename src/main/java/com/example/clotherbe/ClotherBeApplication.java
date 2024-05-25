@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class ClotherBeApplication {
 
     public static void main(String[] args) {
+
         SpringApplication.run(ClotherBeApplication.class, args);
     }
 

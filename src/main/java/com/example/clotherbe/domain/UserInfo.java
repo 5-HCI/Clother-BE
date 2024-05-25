@@ -8,7 +8,7 @@ import lombok.Setter;
 public class UserInfo {
 
     public String name = "사용자";
-    public String gender = "남자";
+    public String gender = "전체";
 
     public UserInfo() {
     }
