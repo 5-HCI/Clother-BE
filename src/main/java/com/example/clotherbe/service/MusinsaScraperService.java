@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class MusinsaScraperService {
@@ -28,7 +29,8 @@ public class MusinsaScraperService {
         driver = new ChromeDriver(options);
     }
 
-    public List<String> scrapeMusinsaImages(String gender, String url) {
+    public List<String> scrapeMusinsaImages(String gender, String url, int linkCount,
+                                            String returnUrl1, String returnUrl2) {
         List<String> imageUrls = new ArrayList<>();
 
         driver.get(url);
@@ -50,15 +52,44 @@ public class MusinsaScraperService {
         List<WebElement> images = driver.findElements(By.tagName("img"));
 
         // 세 번째 이미지부터 src 속성을 추출하여 리스트에 추가
-        for (int i = 2; i < images.size(); i++) { // 인덱스 2는 세 번째 요소를 의미함
+        for (int i = 2; i < linkCount+2; i++) { // 인덱스 2는 세 번째 요소를 의미함
             WebElement img = images.get(i);
             String src = img.getAttribute("src");
+
+            String id = "";
+            if(!returnUrl1.isEmpty()){
+
+                try {
+                    WebElement parentAnchor = img.findElement(By.xpath("ancestor::a[1]"));
+                    String onclick = parentAnchor.getAttribute("onclick");
+                    id = extractIdFromOnclick(onclick);
+
+                } catch (NoSuchElementException e) {
+                    //System.out.println("No anchor tag found for image: " + src);
+                }
+            }
+
             if (!src.isEmpty()) {
                 imageUrls.add(src);
+
+                if(!returnUrl1.isEmpty()){
+                    String returnUrl = returnUrl1+id+returnUrl2;
+                    imageUrls.add(returnUrl);
+                }
             }
         }
 
         return imageUrls;
+    }
+
+    private String extractIdFromOnclick(String onclick) {
+        // Extract the ID from the onclick attribute
+        if (onclick != null && onclick.contains("goView")) {
+            int start = onclick.indexOf("'") + 1;
+            int end = onclick.indexOf("'", start);
+            return onclick.substring(start, end);
+        }
+        return "";
     }
 
     public void closeWebDriver() {
