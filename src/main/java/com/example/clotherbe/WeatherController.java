@@ -18,11 +18,11 @@ public class WeatherController {
     @Autowired
     private LatXLngY latXLngY;
 
-    @GetMapping("/weatherapi")
-    public String getTodayWeather() throws IOException {
-        String apiResult = weatherService.callWeatherApi(55, 127, "20240601");
-        return apiResult;
-    }
+//    @GetMapping("/weatherapi")
+//    public String getTodayWeather() throws IOException {
+//        String apiResult = weatherService.callWeatherApi(59, 125, "20240601");
+//        return apiResult;
+//    }
 
     @GetMapping("/weather")
     public ResponseEntity<ArrayList<Weather>> getTodayWeather(
