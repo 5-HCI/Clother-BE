@@ -7,8 +7,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
 @RestController
@@ -47,11 +48,12 @@ public class MusinsaController {
      * 코디숍
      * */
     @GetMapping("/codishop")
-    public List<String> codishopScrapeImages(@RequestParam(required = false, defaultValue="전체") String gender,
+    public Map<Integer, Map<String, String>> codishopScrapeImages(@RequestParam(required = false, defaultValue="전체") String gender,
                                              @RequestParam(required = false, defaultValue="") List<String> concept,
                                              @RequestParam Integer temperature) {
 
-        List<String> returnLink = new ArrayList<>(); // 최종적으로 반환할 사진 링크
+        Map<Integer, Map<String, String>> returnLink = new HashMap<>(); // 최종적으로 반환할 사진 링크
+
 
         //기온에 따른 무신사 태그 번호 가져오기
         String tag = determineTemperature(temperature);
@@ -71,6 +73,7 @@ public class MusinsaController {
         }
         int linkCount = 4/concept.size(); // 각 컨셉별 몇 개의 링크(사진)가 필요한지
 
+        int index = 1;
         for(int i=0;i<concept.size();i++){
             /**
              * 코디숍 URL, 최신순 기준(sort=NEWEST) or 조회순 기준(sort=VIEW_COUNT)
@@ -86,10 +89,15 @@ public class MusinsaController {
             String returnUrl2 = "?use_yn_360=&style_type=" + concept.get(i) +
                     "&brand=&tag_no" + tag +"=&display_cnt=60&list_kind=big&sort=NEWEST&page=1";
 
-            if(i == randomNumber)
-                returnLink.addAll(scraperService.scrapeMusinsaImages(returnGender, url, linkCount+1, returnUrl1, returnUrl2));
-            else
-                returnLink.addAll(scraperService.scrapeMusinsaImages(returnGender, url, linkCount, returnUrl1, returnUrl2));
+            int currentLinkCount = (i == randomNumber) ? linkCount + 1 : linkCount;
+            List<String> scrapedLinks = scraperService.scrapeMusinsaImages(returnGender, url, currentLinkCount, returnUrl1, returnUrl2);
+
+            for (int j = 0; j < scrapedLinks.size(); j += 2) {
+                Map<String, String> imageLinkMap = new HashMap<>();
+                imageLinkMap.put("imageLink", scrapedLinks.get(j));
+                imageLinkMap.put("musinsaPage", scrapedLinks.get(j + 1));
+                returnLink.put(index++, imageLinkMap);
+            }
         }
 
         return returnLink;
@@ -99,11 +107,11 @@ public class MusinsaController {
      * 코디맵
      * */
     @GetMapping("/codimap")
-    public List<String> codimapScrapeImages(@RequestParam(required = false, defaultValue="전체") String gender,
+    public Map<Integer, Map<String, String>> codimapScrapeImages(@RequestParam(required = false, defaultValue="전체") String gender,
                                             @RequestParam(required = false, defaultValue="") List<String> concept,
                                             @RequestParam Integer temperature) {
 
-        List<String> returnLink = new ArrayList<>(); // 최종적으로 반환할 사진 링크
+        Map<Integer, Map<String, String>> returnLink = new HashMap<>(); // 최종적으로 반환할 사진 링크
 
         //기온에 따른 무신사 태그 번호 가져오기
         String hotTag = determineTemperature(temperature + 3);
@@ -116,6 +124,8 @@ public class MusinsaController {
         else if(gender.equals("F"))
             returnGender = "여성";
 
+
+        int index = 1;
         //스타일별 3개의 사진 반환
         for(int i=0;i<concept.size();i++){
 
@@ -125,14 +135,26 @@ public class MusinsaController {
 
             String url1 = "https://www.musinsa.com/app/codimap/lists?style_type=" + concept.get(i) +
                     "&tag_no=" + hotTag + "&brand=&display_cnt=60&list_kind=big&sort=date&page=1";
-            returnLink.addAll(scraperService.scrapeMusinsaImages(returnGender, url1, 1, "", ""));
+            List<String> hotLinks = scraperService.scrapeMusinsaImages(returnGender, url1, 1, "", "");
             String url2 = "https://www.musinsa.com/app/codimap/lists?style_type=" + concept.get(i) +
                     "&tag_no=" + tag + "&brand=&display_cnt=60&list_kind=big&sort=date&page=1";
-            returnLink.addAll(scraperService.scrapeMusinsaImages(returnGender, url2, 1, "", ""));
+            List<String> normalLinks = scraperService.scrapeMusinsaImages(returnGender, url2, 1, "", "");
             String url3 = "https://www.musinsa.com/app/codimap/lists?style_type=" + concept.get(i) +
                     "&tag_no=" + coldTag + "&brand=&display_cnt=60&list_kind=big&sort=date&page=1";
-            returnLink.addAll(scraperService.scrapeMusinsaImages(returnGender, url3, 1, "", ""));
+            List<String> coldLinks = scraperService.scrapeMusinsaImages(returnGender, url3, 1, "", "");
 
+            // 각 스타일의 링크들을 맵으로 묶기
+            Map<String, String> styleLinks = new HashMap<>();
+            if (!hotLinks.isEmpty()) {
+                styleLinks.put("hot", hotLinks.get(0));
+            }
+            if (!normalLinks.isEmpty()) {
+                styleLinks.put("normal", normalLinks.get(0));
+            }
+            if (!coldLinks.isEmpty()) {
+                styleLinks.put("cold", coldLinks.get(0));
+            }
+            returnLink.put(index++, styleLinks);
         }
 
         return returnLink;
