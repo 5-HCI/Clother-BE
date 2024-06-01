@@ -1,4 +1,4 @@
-package com.example.clotherbe;
+package com.example.clotherbe.domain;
 
 import org.springframework.stereotype.Service;
 

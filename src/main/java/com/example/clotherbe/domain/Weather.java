@@ -1,4 +1,4 @@
-package com.example.clotherbe;
+package com.example.clotherbe.domain;
 
 import lombok.Getter;
 import lombok.Setter;

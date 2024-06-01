@@ -1,5 +1,8 @@
-package com.example.clotherbe;
+package com.example.clotherbe.controller;
 
+import com.example.clotherbe.domain.LatXLngY;
+import com.example.clotherbe.domain.Weather;
+import com.example.clotherbe.service.WeatherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

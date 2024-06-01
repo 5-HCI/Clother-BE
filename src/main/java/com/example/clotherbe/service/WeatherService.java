@@ -1,5 +1,6 @@
-package com.example.clotherbe;
+package com.example.clotherbe.service;
 
+import com.example.clotherbe.domain.Weather;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
