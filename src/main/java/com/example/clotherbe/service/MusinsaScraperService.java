@@ -19,7 +19,7 @@ public class MusinsaScraperService {
     public MusinsaScraperService() {
 
         // WebDriver 경로 설정 (ChromeDriver 경로)
-        System.setProperty("webdriver.chrome.driver", "./src/main/resources/chromedriver.exe");
+        System.setProperty("webdriver.chrome.driver", "/home/ubuntu/Clother-BE/src/main/resources/chromedriver.exe");
 
         // ChromeOptions 설정
         ChromeOptions options = new ChromeOptions();
