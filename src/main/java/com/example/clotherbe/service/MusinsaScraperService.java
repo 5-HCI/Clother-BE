@@ -19,11 +19,13 @@ public class MusinsaScraperService {
     public MusinsaScraperService() {
 
         // WebDriver 경로 설정 (ChromeDriver 경로)
-        System.setProperty("webdriver.chrome.driver", "src/main/resources/chromedriver");
+        System.setProperty("webdriver.chrome.driver", "chromedriver");
 
         // ChromeOptions 설정
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless"); // 브라우저 창을 띄우지 않음
+        options.addArguments("--no-sandbox");
+        options.addArguments("--disable-dev-shm-usage");
 
         // WebDriver 시작
         driver = new ChromeDriver(options);
