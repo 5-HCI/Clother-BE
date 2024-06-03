@@ -24,6 +24,8 @@ public class MusinsaScraperService {
         // ChromeOptions 설정
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless"); // 브라우저 창을 띄우지 않음
+        options.addArguments("--no-sandbox");
+        options.addArguments("--disable-dev-shm-usage");
 
         // WebDriver 시작
         driver = new ChromeDriver(options);
