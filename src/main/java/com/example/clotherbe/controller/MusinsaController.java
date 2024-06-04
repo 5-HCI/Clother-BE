@@ -71,6 +71,7 @@ public class MusinsaController {
             // 0에서 2 사이의 랜덤 숫자 생성 (0, 1, 2 중 하나)
             randomNumber = ThreadLocalRandom.current().nextInt(3);
         }
+
         int linkCount = 4/concept.size(); // 각 컨셉별 몇 개의 링크(사진)가 필요한지
 
         int index = 1;
@@ -84,13 +85,19 @@ public class MusinsaController {
                     "&brand=" + "&tag_no=" + tag + // 기온에 따른 태그 정보
                     "&display_cnt=60&list_kind=big&sort=NEWEST&page=1";
 
+
             // 무신사 링크 url
             String returnUrl1 = "https://www.musinsa.com/app/styles/views/";
             String returnUrl2 = "?use_yn_360=&style_type=" + concept.get(i) +
                     "&brand=&tag_no" + tag +"=&display_cnt=60&list_kind=big&sort=NEWEST&page=1";
 
-            int currentLinkCount = (i == randomNumber) ? linkCount + 1 : linkCount;
-            List<String> scrapedLinks = scraperService.scrapeMusinsaImages(returnGender, url, currentLinkCount, returnUrl1, returnUrl2);
+            List<String> scrapedLinks;
+
+            if(concept.size() == 3 && i == randomNumber) {
+                scrapedLinks = scraperService.scrapeMusinsaImages(returnGender, url, linkCount+1, returnUrl1, returnUrl2);
+            }else{
+                scrapedLinks = scraperService.scrapeMusinsaImages(returnGender, url, linkCount, returnUrl1, returnUrl2);
+            }
 
             for (int j = 0; j < scrapedLinks.size(); j += 2) {
                 Map<String, String> imageLinkMap = new HashMap<>();
