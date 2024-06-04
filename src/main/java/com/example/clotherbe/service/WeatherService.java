@@ -76,9 +76,10 @@ public class WeatherService {
     }
 
     @Transactional
-    public ArrayList<Weather> dataParsing(String apiResult, String date) {
+    public Map<String, Object> dataParsing(String apiResult, String date, String userName) {
         ArrayList<Weather> weatherList = new ArrayList<>();
         Map<String, Weather> weatherMap = new HashMap<>();
+        String weatherBanner = "";
 
         try {
             JSONParser jsonParser = new JSONParser();
@@ -108,7 +109,6 @@ public class WeatherService {
                     try {
                         fcstValue = Double.parseDouble(fcstValueString);
                     } catch (NumberFormatException e) {
-                        // 숫자가 아닌 값인 경우 fcstValue를 0으로 설정
                         fcstValue = 0.0;
                     }
 
@@ -138,7 +138,6 @@ public class WeatherService {
 
             weatherList.addAll(weatherMap.values());
 
-            // 시간 순서대로 정렬
             Collections.sort(weatherList, new Comparator<Weather>() {
                 @Override
                 public int compare(Weather o1, Weather o2) {
@@ -146,10 +145,38 @@ public class WeatherService {
                 }
             });
 
+            // Generate weatherBanner based on the first weather data of the day
+            if (!weatherList.isEmpty()) {
+                Weather weather = weatherList.get(0);
+
+                if (weather.getSKY() == 4) {
+                    weatherBanner = "오늘은 날이 흐려요ㅠ 그래도 아자아자!";
+                }
+                if (weather.getTMX() > 24) {
+                    weatherBanner = "오늘은 햇빛이 뜨거우니 얇은 옷 어때요?";
+                }
+                if (weather.getTMX() < 10) {
+                    weatherBanner = "오늘은 기온이 대체적으로 낮아요! 겉옷 챙기는거 어때요?";
+                }
+                if (weather.getPOP() >= 50) {
+                    weatherBanner = "오늘은 비가 올 확률이 높아요! 우산 꼭 챙기세요!";
+                } else {
+                    weatherBanner = "오늘은 날이 맑아요! 기분 좋은 하루 보내세요 :)";
+                }
+            }
+
+            if (!userName.isEmpty()) {
+                weatherBanner = userName + "님, " + weatherBanner;
+            }
+
         } catch (ParseException e) {
             e.printStackTrace();
         }
 
-        return weatherList;
+        Map<String, Object> result = new HashMap<>();
+        result.put("weatherBanner", weatherBanner);
+        result.put("weatherData", weatherList);
+
+        return result;
     }
 }
