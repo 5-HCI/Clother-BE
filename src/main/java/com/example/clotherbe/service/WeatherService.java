@@ -39,7 +39,7 @@ public class WeatherService {
         String inputDate = todayDate;
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         LocalDate date = LocalDate.parse(inputDate, formatter); // 문자열을 LocalDate 객체로 변환
-        LocalDate previousDate = date.minusDays(1); // 오늘날짜 기준 전날 계산
+        LocalDate previousDate = date.minusDays(2); // 오늘날짜 기준 이틀 전날 계산
         String baseDate = previousDate.format(formatter); // 결과날짜 문자열로 변환
 
         // 받은 오늘날짜 기준 전날 2300 고정 호출
